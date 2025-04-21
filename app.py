@@ -119,7 +119,7 @@ def display_image(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    # Start the Flask development server
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+    port = int(os.environ.get("PORT", 10000))  # Render sets PORT, fallback for local testing
+    app.run(host='0.0.0.0', port=port, debug=True)
 
     
