@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Detection Result</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #FFC107;
+            --light: #f8f9fa;
+            --dark: #212121;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: var(--dark);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            margin-top: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            margin: 1.5rem 0;
+            animation: zoomIn 0.6s ease-out;
+            border: 3px solid white;
+            outline: 1px solid #eee;
+        }
+        
+        .result-details {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .result-item {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background-color: rgba(76, 175, 80, 0.05);
+            border-radius: 8px;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .confidence-meter {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 10px;
+            transition: width 1.5s ease-out;
+            width: 0;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .back-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .back-btn:hover i {
+            transform: translateX(-3px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .treatment-tip {
+            background-color: #FFF9C4;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--secondary);
+            text-align: left;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        .treatment-tip h3 {
+            color: #FF8F00;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .result-card {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Detection Result</h1>
+        
+        <div class="result-card">
+            <img src="{{ url_for('display_image', filename=filename) }}" alt="Analyzed leaf" class="result-image">
+            
+            <div class="result-details">
+                <div class="result-item">
+                    <span class="result-label">Predicted Condition:</span>
+                    <span class="result-value">{{ predicted_class }}</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Confidence Level:</span>
+                    <span class="result-value">{{ confidence }}%</span>
+                </div>
+                
+                <div class="confidence-meter">
+                    <div class="confidence-fill" style="width: {{ confidence }}%"></div>
+                </div>
+            </div>
+            
+            {% if predicted_class != "Healthy" %}
+            <div class="treatment-tip">
+                <h3><i class="fas fa-lightbulb"></i> Recommended Action</h3>
+                <p>Based on our analysis, we recommend isolating the affected plant and applying appropriate treatment. For {{ predicted_class }}, consider using [specific treatment]. Remove severely affected leaves to prevent spread.</p>
+            </div>
+            {% else %}
+            <div class="treatment-tip" style="background-color: #E8F5E9; border-left-color: var(--primary);">
+                <h3><i class="fas fa-check-circle"></i> Plant Health Status</h3>
+                <p>Your plant appears to be healthy! Continue with your current care routine. Regular monitoring helps maintain plant health.</p>
+            </div>
+            {% endif %}
+            
+            <a href="{{ url_for('upload_and_predict') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Analyze Another Image
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Plant Disease Detection System &copy; 2025</p>
+    </footer>
+    
+    <script>
+        // Animate confidence meter on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const confidenceFill = document.querySelector('.confidence-fill');
+            // Trigger the animation by resetting the width
+            confidenceFill.style.width = '0';
+            setTimeout(() => {
+                confidenceFill.style.width = '{{ confidence }}%';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
